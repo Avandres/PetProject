@@ -43,7 +43,6 @@ class SiameseNetworkClass:
                            optimizer=RMSprop(0.0005),
                            metrics=[accuracy]
                            )
-        self.__EPOCHS = 100
         self.__BATCH_SIZE = 128
 
     def __build_model(self, input_dim):
@@ -90,17 +89,19 @@ class SiameseNetworkClass:
     def save_weights(self, path_to_weights='users_weights.ckpt'):
         self.model.save_weights(path_to_weights)
 
-    def train_model(self, x_train, y_train, x_test=None, y_test=None):
+    def train_model(self, x_train, y_train, x_test=None, y_test=None, epochs=100):
         images_for_input_a = x_train[:, 0]
         images_for_input_b = x_train[:, 1]
         self.model.fit([images_for_input_a, images_for_input_b],
                        y_train,
                        batch_size=128,
                        verbose=1,
-                       epochs=self.__EPOCHS
+                       epochs=epochs
                        )
         if not (x_test is None or y_test is None):
-            test_prediction = self.model.predict(x_test)
+            images_for_input_a = x_test[:, 0]
+            images_for_input_b = x_test[:, 1]
+            test_prediction = self.model.predict([images_for_input_a, images_for_input_b])
             test_accuracy = accuracy(y_test, test_prediction)
             print("Test accuracy: ", test_accuracy)
 

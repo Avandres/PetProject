@@ -1,2 +1,5 @@
 venv/Lib
-archive.zip
+/archive.zip
+/archive
+/my_face
+/__pycache__
