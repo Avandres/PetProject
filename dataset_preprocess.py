@@ -3,6 +3,8 @@ import random
 
 import numpy as np
 from PIL import Image
+from tqdm import trange
+import sys
 
 
 class DatasetPreprocessor:
@@ -12,7 +14,7 @@ class DatasetPreprocessor:
 
     def preprocess_image(self, img, height, width):
         grayscale_img = img.convert('L')
-        resized_img = grayscale_img.resize((height, width))
+        resized_img = grayscale_img.resize((width, height))
         float_img_array = np.asarray(resized_img).astype('float32')
         normalized_img_array = float_img_array / 255.0
         return normalized_img_array
@@ -41,10 +43,13 @@ class DatasetPreprocessor:
         return img1_array, img2_array
 
     def get_data(self, total_sample_size, img_height, img_width, path='.//'):
+        if total_sample_size < 1:
+            raise ValueError("Argument 'total_sample_size' must be greater than zero.")
         X = np.zeros([total_sample_size, 2, img_height, img_width, 1])
         Y = np.zeros([total_sample_size, 1])
         directories = os.listdir(path)
-        for i in range(total_sample_size):
+        print("Формирование выборки данных: ")
+        for i in trange(total_sample_size, file=sys.stdout, colour='white'):
             if i % 2 == 0:
                 img1_array, img2_array = self.__get_same_img_arrays(directories, img_height, img_width, path=path)
                 Y[i] = 1

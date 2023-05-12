@@ -34,7 +34,7 @@ def load_preprocessed_image(filepath, height, width):
 # Тест!!! Убрать!!!
 
 
-class SiameseNetworkClass:
+class SiameseConv2d:
 
     def __init__(self, input_dim):
         self.input_dim = input_dim
@@ -108,11 +108,11 @@ class SiameseNetworkClass:
     def make_prediction(self, image1, image2):
         image1 = image1[None, ..., None]
         image2 = image2[None, ..., None]
-        return self.model.predict([image1, image2])
+        return self.model.predict([image1, image2], verbose=0)
 
 
 if __name__ == '__main__':
-    my_network = SiameseNetworkClass((50, 50, 1))
+    my_network = SiameseConv2d((50, 50, 1))
     my_network.load_weights('users_weights.ckpt')
     photo1 = r'C:\Work\Сиамские_сети\signatures\s162\1.png'
     photo2 = r'C:\Work\Сиамские_сети\signatures\s162\2.png'
