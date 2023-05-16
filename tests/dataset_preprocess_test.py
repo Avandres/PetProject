@@ -23,8 +23,9 @@ class DatasetPreprocessorTest(TestCase):
             test_dataset_preprocessor.preprocess_image(14, 50, 50)
             test_dataset_preprocessor.preprocess_image('img', 50, 50)
             test_dataset_preprocessor.preprocess_image(True, 50, 50)
-        self.assertEqual("Argument 'img' must be PIL.Image.", img_type_error.exception.args[0])
+        self.assertEqual("Argument 'img' must be PIL.JpegImagePlugin.JpegImageFile.", img_type_error.exception.args[0])
         img = Image.open('test_images/0/test_image0.jpg')
+        print(type(img))
         with self.assertRaises(TypeError) as height_type_error:
             test_dataset_preprocessor.preprocess_image(img, 'str', 50)
             test_dataset_preprocessor.preprocess_image(img, 4.25, 50)
@@ -50,11 +51,11 @@ class DatasetPreprocessorTest(TestCase):
         with self.assertRaises(ValueError) as img_height_error:
             test_dataset_preprocessor.preprocess_image(img, 0, 50)
             test_dataset_preprocessor.preprocess_image(img, -1, 50)
-        self.assertEqual("Argument 'img_height' must be greater than zero.", img_height_error.exception.args[0])
+        self.assertEqual("Argument 'height' must be greater than zero.", img_height_error.exception.args[0])
         with self.assertRaises(ValueError) as img_width_error:
             test_dataset_preprocessor.preprocess_image(img, 50, 0)
             test_dataset_preprocessor.preprocess_image(img, 50, -1)
-        self.assertEqual("Argument 'img_width' must be greater than zero.", img_width_error.exception.args[0])
+        self.assertEqual("Argument 'width' must be greater than zero.", img_width_error.exception.args[0])
 
     def test_get_data_sample_size(self):
         test_dataset_preprocessor = DatasetPreprocessor()
@@ -90,7 +91,7 @@ class DatasetPreprocessorTest(TestCase):
             test_dataset_preprocessor.get_data(4, 50, 50, path=os.getcwd())
         self.assertEqual("There is no *.png or *.jpg files in " + os.getcwd() + '.', path_error.exception.args[0])
 
-    def test_get_data_input_types(self):
+    def test_get_data_arguments_types(self):
         test_dataset_preprocessor = DatasetPreprocessor()
         with self.assertRaises(TypeError) as sample_size_type_error:
             test_dataset_preprocessor.get_data(np.zeros((50, 50)), 50, 50)
@@ -111,7 +112,7 @@ class DatasetPreprocessorTest(TestCase):
             test_dataset_preprocessor.get_data(4, 50, 50, path=1)
             test_dataset_preprocessor.get_data(4, 50, 50, path=1.1)
             test_dataset_preprocessor.get_data(4, 50, 50, path=True)
-        self.assertEqual("Argument 'path' must be int.", path_type_error.exception.args[0])
+        self.assertEqual("Argument 'path' must be str.", path_type_error.exception.args[0])
 
     def test_get_data_output_types(self):
         test_dataset_preprocessor = DatasetPreprocessor()
