@@ -38,32 +38,32 @@ class ComputerVisionModule:
 if __name__ == '__main__':
     dataset_preprocessor = DatasetPreprocessor()
     network = SiameseConv2d((50, 50, 1))
-    x, y = dataset_preprocessor.get_data(150000, 50, 50, 'C://Work//PetProject//archive//Extracted Faces')
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+    #x, y = dataset_preprocessor.get_data(150000, 50, 50, 'C://Work//PetProject//archive//Extracted Faces')
+    #x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
     network.load_weights('users_weights.ckpt')
-    network.train_model(x_train, y_train, x_test, y_test, epochs=2000)
-    network.save_weights('users_weights2.ckpt')
+    #network.train_model(x_train, y_train, x_test, y_test, epochs=2000)
+    #network.save_weights('users_weights2.ckpt')
 
-    # cam = cv2.VideoCapture(0)
-    # result, photo = cam.read()
-    # faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-    # faces = faceCascade.detectMultiScale(
-    #     photo,
-    #     scaleFactor=1.1,
-    #     minNeighbors=5,
-    #     minSize=(30, 30)
-    # )
-    # print("Found {0} Faces!".format(len(faces)))
-    # x, y, w, h = faces[0]
-    # x1, x2 = x, x + w
-    # y1, y2 = y, y + h
-    # photo = photo[y:y + h, x:x + w, :]
-    # cam.release()
-    #
-    # module = ComputerVisionModule(siamese_network=network, owners_face_photo_directory='C://Work//PetProject//my_face')
-    # my_list = module.is_owner(photo)
-    # print(my_list)
-    #
+    cam = cv2.VideoCapture(0)
+    result, photo = cam.read()
+    faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+    faces = faceCascade.detectMultiScale(
+        photo,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30)
+    )
+    print("Found {0} Faces!".format(len(faces)))
+    x, y, w, h = faces[0]
+    x1, x2 = x, x + w
+    y1, y2 = y, y + h
+    photo = photo[y:y + h, x:x + w, :]
+    cam.release()
+
+    module = ComputerVisionModule(siamese_network=network, owners_face_photo_directory='C://Work//PetProject//my_face')
+    my_list = module.is_owner(photo)
+    print(my_list)
+
     # for i in os.listdir('C://Work//PetProject//archive//Extracted Faces'):
     #     photo = cv2.imread('C://Work//PetProject//archive//Extracted Faces//' + i + '//0.jpg')
     #     my_list = module.is_owner(photo)

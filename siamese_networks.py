@@ -89,26 +89,65 @@ class SiameseConv2d:
     def save_weights(self, path_to_weights='users_weights.ckpt'):
         self.model.save_weights(path_to_weights)
 
-    def train_model(self, x_train, y_train, x_test=None, y_test=None, epochs=100):
+    def train_model(self, x_train, y_train, validation_data=None, verbose=1, epochs=100):
+        if not isinstance(x_train, np.ndarray):
+            raise TypeError("Argument 'x_train' must be numpy.ndarray.")
+        if not isinstance(y_train, np.ndarray):
+            raise TypeError("Argument 'y_train' must be numpy.ndarray.")
+        if not ((validation_data is None) or (type(validation_data) in (None, tuple, list))):
+            raise TypeError("Argument 'validation_data' must be None, tuple or list.")
+        if not isinstance(epochs, int):
+            raise TypeError("Argument 'epochs' must be int.")
+        if not epochs > 0:
+            raise ValueError("Argument 'epochs' must be greater than zero.")
+        if not x_train.dtype in (int, float, np.int32, np.float32, np.int64, np.float64):
+            raise ValueError("Argument 'x_train' must have dtype int or float.")
+        if not y_train.dtype in (int, float, np.int32, np.float32, np.int64, np.float64):
+            raise ValueError("Argument 'y_train' must have dtype int or float.")
+        if (x_train.ndim != 5) or (x_train.shape[1] != 2) or (x_train.shape[2:] != self.input_dim):
+            raise ValueError("Shape of x_train must be (sample_size, 2, img_height, img_width, 1).")
+        if y_train.ndim != 1:
+            raise ValueError("ndim of y_train must be 1.")
         images_for_input_a = x_train[:, 0]
         images_for_input_b = x_train[:, 1]
-        self.model.fit([images_for_input_a, images_for_input_b],
-                       y_train,
-                       batch_size=128,
-                       verbose=1,
-                       epochs=epochs
-                       )
-        if not (x_test is None or y_test is None):
+        history = self.model.fit([images_for_input_a, images_for_input_b],
+                                  y_train,
+                                  batch_size=128,
+                                  verbose=verbose,
+                                  epochs=epochs
+                                 )
+        if not (validation_data is None):
+            x_test = validation_data[0]
+            y_test = validation_data[1]
+            if not x_test.dtype in (int, float, np.int32, np.float32, np.int64, np.float64):
+                raise ValueError("Argument 'validation_data[0]' must have dtype int or float.")
+            if not y_test.dtype in (int, float, np.int32, np.float32, np.int64, np.float64):
+                raise ValueError("Argument 'validation_data[1]' must have dtype int or float.")
+            if (x_test.ndim != 5) or (x_test.shape[1] != 2) or (x_test.shape[2:] != self.input_dim):
+                raise ValueError("Shape of validation_data[0] must be (sample_size, 2, img_height, img_width, 1).")
+            if y_test.ndim != 1:
+                raise ValueError("ndim of validation_data[1] must be 1.")
             images_for_input_a = x_test[:, 0]
             images_for_input_b = x_test[:, 1]
             test_prediction = self.model.predict([images_for_input_a, images_for_input_b])
             test_accuracy = accuracy(y_test, test_prediction)
             print("Test accuracy: ", test_accuracy)
+        return history
 
     def make_prediction(self, image1, image2):
-        image1 = image1[None, ..., None]
-        image2 = image2[None, ..., None]
-        return self.model.predict([image1, image2], verbose=0)
+        if not isinstance(image1, np.ndarray):
+            raise TypeError("Argument 'image1' must be numpy.ndarray with dtype=float")
+        if not isinstance(image2, np.ndarray):
+            raise TypeError("Argument 'image2' must be numpy.ndarray with dtype=float")
+        if image1.shape != self.input_dim:
+            raise ValueError("The shape of 'image1' and the shape "
+                             "specified in the constructor of SiameseConv2d don't match.")
+        if image2.shape != self.input_dim:
+            raise ValueError("The shape of 'image2' and the shape "
+                             "specified in the constructor of SiameseConv2d don't match.")
+        image1 = image1[None, ...]
+        image2 = image2[None, ...]
+        return self.model.predict([image1, image2], verbose=0)[0, 0]
 
 
 if __name__ == '__main__':
