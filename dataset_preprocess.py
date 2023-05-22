@@ -36,32 +36,44 @@ class DatasetPreprocessor:
         return img_array
 
     def __get_same_img_arrays(self, directories, img_height, img_width, path=".//"):
+        directories = [directory for directory in directories if os.path.isdir(os.path.join(path, directory))]
+        if not directories:
+            raise NotADirectoryError("There are no directories on the specified path: " + path)
         directory = random.choice(directories)
-        filepaths = os.listdir(path + '\\' + directory)
+        filepaths = os.listdir(os.path.join(path, directory))
+        filepaths = [filepath for filepath in filepaths if filepath.endswith(".png") or filepath.endswith(".jpg")]
+        if not filepaths:
+            raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
+                                     + os.path.join(path, directory))
         filename_1, filename_2 = np.random.choice(filepaths, 2, replace=False)
-        filepath_1 = path + '\\' + directory + '\\' + filename_1
-        filepath_2 = path + '\\' + directory + '\\' + filename_2
+        filepath_1 = os.path.join(path, directory, filename_1)
+        filepath_2 = os.path.join(path, directory, filename_2)
         img1_array = self.__load_preprocessed_image(filepath_1, img_height, img_width)
         img2_array = self.__load_preprocessed_image(filepath_2, img_height, img_width)
         return img1_array, img2_array
 
     def __get_different_img_arrays(self, directories, img_height, img_width, path=".//"):
+        directories = [directory for directory in directories if os.path.isdir(os.path.join(path, directory))]
+        if not directories:
+            raise NotADirectoryError("There are no directories on the specified path: " + path)
         directory_1, directory_2 = np.random.choice(directories, 2, replace=False)
-        filepath_1 = path + r'\\' + directory_1 + r'\\' + random.choice(os.listdir(path + r'\\' + directory_1))
-        filepath_2 = path + r'\\' + directory_2 + r'\\' + random.choice(os.listdir(path + r'\\' + directory_2))
+        filepaths_1 = [filepath for filepath in os.listdir(os.path.join(path, directory_1))
+                       if filepath.endswith(".png") or filepath.endswith(".jpg")]
+        if not filepaths_1:
+            raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
+                                     + os.path.join(path, directory_1) + '.')
+        filepaths_2 = [filepath for filepath in os.listdir(os.path.join(path, directory_2))
+                       if filepath.endswith(".png") or filepath.endswith(".jpg")]
+        if not filepaths_2:
+            raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
+                                     + os.path.join(path, directory_2) + '.')
+        filepath_1 = os.path.join(path, directory_1, random.choice(filepaths_1))
+        filepath_2 = os.path.join(path, directory_2, random.choice(filepaths_2))
         img1_array = self.__load_preprocessed_image(filepath_1, img_height, img_width)
         img2_array = self.__load_preprocessed_image(filepath_2, img_height, img_width)
         return img1_array, img2_array
 
-    def get_data(self, total_sample_size, img_height, img_width, path=r'.\\'):
-        if not isinstance(total_sample_size, int):
-            raise TypeError("Argument 'total_sample_size' must be int.")
-        if not isinstance(img_height, int):
-            raise TypeError("Argument 'img_height' must be int.")
-        if not isinstance(img_width, int):
-            raise TypeError("Argument 'img_width' must be int.")
-        if not isinstance(path, str):
-            raise TypeError("Argument 'path' must be str.")
+    def get_data(self, total_sample_size, img_height, img_width, path='.//'):
         if total_sample_size < 1:
             raise ValueError("Argument 'total_sample_size' must be greater than zero.")
         if img_height < 1:
