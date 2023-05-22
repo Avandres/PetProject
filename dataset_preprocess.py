@@ -44,7 +44,7 @@ class DatasetPreprocessor:
         filepaths = [filepath for filepath in filepaths if filepath.endswith(".png") or filepath.endswith(".jpg")]
         if not filepaths:
             raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
-                                     + os.path.join(path, directory))
+                                    + os.path.join(path, directory))
         filename_1, filename_2 = np.random.choice(filepaths, 2, replace=False)
         filepath_1 = os.path.join(path, directory, filename_1)
         filepath_2 = os.path.join(path, directory, filename_2)
@@ -61,12 +61,12 @@ class DatasetPreprocessor:
                        if filepath.endswith(".png") or filepath.endswith(".jpg")]
         if not filepaths_1:
             raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
-                                     + os.path.join(path, directory_1) + '.')
+                                    + os.path.join(path, directory_1) + '.')
         filepaths_2 = [filepath for filepath in os.listdir(os.path.join(path, directory_2))
                        if filepath.endswith(".png") or filepath.endswith(".jpg")]
         if not filepaths_2:
             raise FileNotFoundError("There are no *.png or *.jpg files on the specified path: "
-                                     + os.path.join(path, directory_2) + '.')
+                                    + os.path.join(path, directory_2) + '.')
         filepath_1 = os.path.join(path, directory_1, random.choice(filepaths_1))
         filepath_2 = os.path.join(path, directory_2, random.choice(filepaths_2))
         img1_array = self.__load_preprocessed_image(filepath_1, img_height, img_width)
@@ -94,6 +94,7 @@ class DatasetPreprocessor:
             X[i, 0, :, :, 0] = img1_array
             X[i, 1, :, :, 0] = img2_array
         return X, Y
+
 
 if __name__ == '__main__':
     total_sample_size = 5000
