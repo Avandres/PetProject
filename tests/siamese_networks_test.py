@@ -15,7 +15,7 @@ def preprocess_image(img, height, width):
 
 class SiameseConv2dTest(TestCase):
 
-    def test_train_model_arguments_shape(self):
+    def test_fit_model_arguments_shape(self):
         x_train = np.array([
             [[[[1.0]] * 10 for _ in range(10)], [[[1.0]] * 10 for _ in range(10)]],
             [[[[2.0]] * 10 for _ in range(10)], [[[2.0]] * 10 for _ in range(10)]],
@@ -24,44 +24,44 @@ class SiameseConv2dTest(TestCase):
         y_train = np.array([1.0, 1.0, 2.0])
         siamese_network = SiameseConv2d((10, 10, 1))
         with self.assertRaises(ValueError) as x_train_exception:
-            siamese_network.train_model(np.array([1, 2, 3, 4]), y_train, epochs=1)
-            siamese_network.train_model(np.array([[1, 2], [3, 4]]), y_train, epochs=1)
-            siamese_network.train_model(np.array([[[1, 2, 3]], [[4, 5, 6]]]), y_train, epochs=1)
+            siamese_network.fit_model(np.array([1, 2, 3, 4]), y_train, epochs=1)
+            siamese_network.fit_model(np.array([[1, 2], [3, 4]]), y_train, epochs=1)
+            siamese_network.fit_model(np.array([[[1, 2, 3]], [[4, 5, 6]]]), y_train, epochs=1)
         self.assertEqual("Shape of x_train must be (sample_size, 2, img_height, img_width, number_of_channels)",
                          x_train_exception.exception.args[0])
         with self.assertRaises(ValueError) as y_train_exception:
-            siamese_network.train_model(x_train, np.array([[1, 2], [3, 4]]), epochs=1)
-            siamese_network.train_model(x_train, np.array([[1], [1]]), epochs=1)
+            siamese_network.fit_model(x_train, np.array([[1, 2], [3, 4]]), epochs=1)
+            siamese_network.fit_model(x_train, np.array([[1], [1]]), epochs=1)
         self.assertEqual("Number of dimensions of y_train must be 1",
                          y_train_exception.exception.args[0])
         with self.assertRaises(ValueError) as train_data_exception:
-            siamese_network.train_model(x_train, np.array([1, 2]), epochs=1)
-            siamese_network.train_model(x_train, np.array([1, 2, 3, 4]), epochs=1)
+            siamese_network.fit_model(x_train, np.array([1, 2]), epochs=1)
+            siamese_network.fit_model(x_train, np.array([1, 2, 3, 4]), epochs=1)
         self.assertEqual("Number of samples in x_train and y_train must be the same",
                          train_data_exception.exception.args[0])
         with self.assertRaises(ValueError) as x_validation_data_exception:
             validation_data = (np.array([1, 2, 3, 4, 5, 6]), y_train)
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
             validation_data = (np.array([[1, 2], [3, 4]]), y_train)
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
         self.assertEqual("Shape of validation_data[0] must be (sample_size, 2, img_height, img_width, number_of_channels)",
                          x_validation_data_exception.exception.args[0])
         with self.assertRaises(ValueError) as y_validation_data_exception:
             validation_data = (x_train, np.array([[1, 2, 3], [4, 5, 6]]))
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
             validation_data = (x_train, np.array([[1], [2]]))
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
         self.assertEqual("Number of dimensions of validation_data[1] must be 1",
                          y_validation_data_exception.exception.args[0])
         with self.assertRaises(ValueError) as validation_data_exception:
             validation_data = (x_train, np.array([1, 2]))
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
             validation_data = (x_train, np.array([1, 2, 3, 4]))
-            siamese_network.train_model(x_train, y_train, validation_data=validation_data, epochs=1)
+            siamese_network.fit_model(x_train, y_train, validation_data=validation_data, epochs=1)
         self.assertEqual("Number of samples in validation_data[0] and validation_data[1] must be the same",
                          validation_data_exception.exception.args[0])
 
-    def test_train_model_arguments_values(self):
+    def test_fit_model_arguments_values(self):
         x_train = np.array([
             [[[[1.0]] * 10 for _ in range(10)], [[[1.0]] * 10 for _ in range(10)]],
             [[[[2.0]] * 10 for _ in range(10)], [[[2.0]] * 10 for _ in range(10)]],
@@ -70,13 +70,13 @@ class SiameseConv2dTest(TestCase):
         y_train = np.array([1.0, 1.0, 2.0])
         siamese_network = SiameseConv2d((10, 10, 1))
         with self.assertRaises(ValueError) as epochs_exception:
-            siamese_network.train_model(x_train, y_train, epochs=-10)
-            siamese_network.train_model(x_train, y_train, epochs=0)
-            siamese_network.train_model(x_train, y_train, epochs=-1)
+            siamese_network.fit_model(x_train, y_train, epochs=-10)
+            siamese_network.fit_model(x_train, y_train, epochs=0)
+            siamese_network.fit_model(x_train, y_train, epochs=-1)
         self.assertEqual("Argument 'epochs' must be greater than zero",
                          epochs_exception.exception.args[0])
 
-    def test_train_model_output_weights(self):
+    def test_fit_model_output_weights(self):
         x_train = np.array([
             [[[[1.0]] * 10 for _ in range(10)], [[[1.0]] * 10 for _ in range(10)]],
             [[[[2.0]] * 10 for _ in range(10)], [[[2.0]] * 10 for _ in range(10)]],
@@ -86,7 +86,7 @@ class SiameseConv2dTest(TestCase):
         siamese_network = SiameseConv2d((10, 10, 1))
         siamese_network.model.load_weights('test_weights_10x10.ckpt')
         tf.random.set_seed(1)
-        history = siamese_network.train_model(x_train, y_train, verbose=0, epochs=10)
+        history = siamese_network.fit_model(x_train, y_train, verbose=0, epochs=10)
         expected_loss = [
             -0.050507064908742905, 0.1848236322402954,
             -0.11972253769636154, -0.2501557767391205,
