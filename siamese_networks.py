@@ -131,13 +131,13 @@ class SiameseConv2d:
 
     def __distance_output_shape(self, shapes: tuple) -> tuple:
         """
-        Calculates the dimension of the Euclidean distance vector
+        Calculates the shape of the euclidean distance vector
 
         Args:
-            shapes (tuple): A tuple with dimensions of two vectors between which the euclidean distance is calculated
+            shapes (tuple): A tuple with shapes of two vectors between which the euclidean distance is calculated
 
         Returns:
-            tuple: The dimension of the vector in which the Euclidean distance is located
+            tuple: The shape of the vector in which the euclidean distance is located
         """
         shape1, shape2 = shapes
         return shape1[0], 1
