@@ -63,9 +63,8 @@ class SiameseConv2d:
     A class for representing a Siamese neural network with convolutional layers.
     More about Siamese neural networks: http://www.cs.toronto.edu/~gkoch/files/msc-thesis.pdf
 
-    Args:
-        input_shape (tuple): The shape of the inputs of the Siamese neural network. It must be equal to the
-                             shape of the images that will be fed into the model.
+    Attributes:
+        model (Model): A Siamese neural network model built in keras.
 
     Methods:
         load_weights: Loads the values of the previously saved weights of the model
@@ -87,25 +86,24 @@ class SiameseConv2d:
             input_shape (tuple): The shape of the inputs of the Siamese neural network. It must be equal to the
                                  shape of the images that will be fed into the model.
         """
-        self.input_shape = input_shape
+        self.__input_shape = input_shape
         self.model = self.__build_model()
         self.model.compile(loss=contrastive_loss,
-                           optimizer=RMSprop(0.0005),
-                           metrics=[compute_train_accuracy]
-                           )
-        self.__BATCH_SIZE = 128
+                             optimizer=RMSprop(0.0005),
+                             metrics=[compute_train_accuracy]
+                             )
 
     def __build_model(self) -> Model:
         """
         Builds a model of the Siamese neural network. To determine the dimension of the inputs,
-        self.input_shape is used, specified in the class constructor
+        self.__input_shape is used, specified in the class constructor
 
         Returns:
             Model: A Siamese neural network model with two inputs and one output. Each input can take a photo,
                    and the distance between the vector-features of two photos is calculated at the output
         """
-        first_image_input = Input(shape=self.input_shape)
-        second_image_input = Input(shape=self.input_shape)
+        first_image_input = Input(shape=self.__input_shape)
+        second_image_input = Input(shape=self.__input_shape)
         base_network = self.__build_base_network()
         first_feature_vector = base_network(first_image_input)
         second_feature_vector = base_network(second_image_input)
@@ -151,7 +149,7 @@ class SiameseConv2d:
         """
         base_network = Sequential()
         # convolutional layer 1
-        base_network.add(Convolution2D(6, (3, 3), input_shape=self.input_shape,
+        base_network.add(Convolution2D(6, (3, 3), input_shape=self.__input_shape,
                                        padding='valid', data_format="channels_last", activation='relu'))
         base_network.add(MaxPooling2D(pool_size=(2, 2)))
         base_network.add(Dropout(0.25))
@@ -212,7 +210,7 @@ class SiameseConv2d:
         """
         if not epochs > 0:
             raise ValueError("Argument 'epochs' must be greater than zero")
-        if (x_train.ndim != 5) or (x_train.shape[1] != 2) or (x_train.shape[2:] != self.input_shape):
+        if (x_train.ndim != 5) or (x_train.shape[1] != 2) or (x_train.shape[2:] != self.__input_shape):
             raise ValueError("Shape of x_train must be (sample_size, 2, img_height, img_width, number_of_channels)")
         if y_train.ndim != 1:
             raise ValueError("Number of dimensions of y_train must be 1")
@@ -221,15 +219,15 @@ class SiameseConv2d:
         images_for_first_input = x_train[:, 0]
         images_for_second_input = x_train[:, 1]
         history = self.model.fit([images_for_first_input, images_for_second_input],
-                                 y_train,
-                                 batch_size=self.__BATCH_SIZE,
-                                 verbose=verbose,
-                                 epochs=epochs
-                                 )
+                                   y_train,
+                                   batch_size=128,
+                                   verbose=verbose,
+                                   epochs=epochs
+                                   )
         if not (validation_data is None):
             x_test = validation_data[0]
             y_test = validation_data[1]
-            if (x_test.ndim != 5) or (x_test.shape[1] != 2) or (x_test.shape[2:] != self.input_shape):
+            if (x_test.ndim != 5) or (x_test.shape[1] != 2) or (x_test.shape[2:] != self.__input_shape):
                 raise ValueError("Shape of validation_data[0] must be (sample_size, 2, img_height, img_width, "
                                  "number_of_channels)")
             if y_test.ndim != 1:
@@ -257,10 +255,10 @@ class SiameseConv2d:
         Returns:
             float: The value of the distance between the vector features of two images
         """
-        if image1.shape != self.input_shape:
+        if image1.shape != self.__input_shape:
             raise ValueError("The shape of 'image1' and the shape "
                              "specified in the constructor of SiameseConv2d don't match")
-        if image2.shape != self.input_shape:
+        if image2.shape != self.__input_shape:
             raise ValueError("The shape of 'image2' and the shape "
                              "specified in the constructor of SiameseConv2d don't match")
         image1 = image1[None, ...]
