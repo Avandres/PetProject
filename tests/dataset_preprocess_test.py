@@ -1,6 +1,7 @@
 from unittest import TestCase, main
 import os
 
+import cv2
 from PIL import Image
 import numpy as np
 
@@ -10,14 +11,14 @@ from dataset_preprocess import DatasetPreprocessor
 class DatasetPreprocessorTest(TestCase):
 
     def test_preprocess_image_is_normalized(self):
-        img = Image.open('test_images/0/test_image0.jpg')
+        img = cv2.imread('test_images/0/test_image0.jpg')
         test_dataset_preprocessor = DatasetPreprocessor()
         preprocessed_image = test_dataset_preprocessor.preprocess_image(img, 50, 50)
         self.assertTrue((preprocessed_image <= 1.0).all())
         self.assertTrue((preprocessed_image >= 0.0).all())
 
     def test_preprocess_image_shape(self):
-        img = Image.open('test_images/0/test_image0.jpg')
+        img = cv2.imread('test_images/0/test_image0.jpg')
         test_dataset_preprocessor = DatasetPreprocessor()
         preprocessed_image = test_dataset_preprocessor.preprocess_image(img, 50, 50)
         self.assertEqual(preprocessed_image.shape, (50, 50))
@@ -45,7 +46,7 @@ class DatasetPreprocessorTest(TestCase):
         with self.assertRaises(ValueError) as sample_size_error:
             test_dataset_preprocessor.get_data(0, 50, 50, path='test_images')
             test_dataset_preprocessor.get_data(-1, 50, 50, path='test_images')
-        self.assertEqual("Argument 'total_sample_size' must be greater than zero.", sample_size_error.exception.args[0])
+        self.assertEqual("Argument 'sample_size' must be greater than zero.", sample_size_error.exception.args[0])
 
     def test_get_data_arrays_shape(self):
         test_dataset_preprocessor = DatasetPreprocessor()
@@ -66,11 +67,11 @@ class DatasetPreprocessorTest(TestCase):
         test_dataset_preprocessor = DatasetPreprocessor()
         with self.assertRaises(NotADirectoryError) as path_error:
             test_dataset_preprocessor.get_data(4, 50, 50, path="test_hollow_directory")
-        self.assertEqual("There are no directories on the specified path: test_hollow_directory", path_error.exception.args[0])
+        self.assertEqual("There are no directories on the specified path", path_error.exception.args[0])
         with self.assertRaises(FileNotFoundError) as path_error:
             test_dataset_preprocessor.get_data(4, 50, 50, path="test_directory_with_hollow_directories")
         self.assertEqual(
-            "There are no *.png or *.jpg files on the specified path: " +
+            "There are no *.png or *.jpg files on the " +
             os.path.join("test_directory_with_hollow_directories", "hollow_0"),
             path_error.exception.args[0]
         )
