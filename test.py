@@ -1,29 +1,67 @@
-import cv2
+import math
+import struct
+from collections import deque
 
-cam = cv2.VideoCapture(0)
+import pyaudio
+import wave
 
-result, image = cam.read()
-#image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+CHUNK = 1024
+FORMAT = pyaudio.paInt16
+CHANNELS = 2
+RATE = 44100
+RECORD_SECOND = 1
+THRESHOLD = 0.02
+WAVE_OUTPUT_FILENAME = 'archive/Audio Commands/22/0.wav'
 
-faceCascade = cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
-faces = faceCascade.detectMultiScale(
-        image,
-        scaleFactor=1.1,
-        minNeighbors=5,
-        minSize=(30, 30)
-)
+p = pyaudio.PyAudio()
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=RATE,
+                input=True,
+                frames_per_buffer=CHUNK)
 
-print("Found {0} Faces!".format(len(faces)))
-for (x, y, w, h) in faces:
-    #cv2.rectangle(image, (x, y), (x + w, y + h), (255, 255, 255), 3)
-    print(x, y, w, h)
-    x1, x2 = x, x + w
-    y1, y2 = y, y + h
-    print(x1, y1, x2, y2)
-    print(image.shape)
-    image = image[y1:y2, x1:x2, :]
-    print(image.shape)
-    #print(image)
-    cv2.imwrite('my_face/10.png', image)
+start_stop_flag = False
+print('Start...')
 
-cam.release()
+def get_rms(data):
+    count = len(data) / 2
+    format = "%dh" % (count)
+    shorts = struct.unpack(format, data)
+
+    sum_squares = 0.0
+    for sample in shorts:
+        n = sample / 32768.0
+        sum_squares += n * n
+
+    return math.sqrt(sum_squares / count)
+
+frames = []
+last_data = deque(maxlen=20)
+timer = 0
+while True:
+    data = stream.read(CHUNK)
+    last_data.append(data)
+    if get_rms(data) > THRESHOLD:
+        if not start_stop_flag:
+            frames += list(last_data)
+        start_stop_flag = True
+        timer = 0
+    if start_stop_flag:
+        if timer >= RATE // CHUNK * RECORD_SECOND:
+            break
+        timer += 1
+        frames.append(data)
+
+print('...End.')
+
+stream.stop_stream()
+stream.close()
+p.terminate()
+
+wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')
+wf.setnchannels(CHANNELS)
+wf.setsampwidth(p.get_sample_size(FORMAT))
+wf.setframerate(RATE)
+wf.writeframes(b''.join(frames))
+wf.close()
+

@@ -89,9 +89,9 @@ class SiameseConv2d:
         self.__input_shape = input_shape
         self.model = self.__build_model()
         self.model.compile(loss=contrastive_loss,
-                             optimizer=RMSprop(0.0005),
-                             metrics=[compute_train_accuracy]
-                             )
+                           optimizer=RMSprop(0.0005),
+                           metrics=[compute_train_accuracy]
+                           )
 
     def __build_model(self) -> Model:
         """
@@ -219,11 +219,11 @@ class SiameseConv2d:
         images_for_first_input = x_train[:, 0]
         images_for_second_input = x_train[:, 1]
         history = self.model.fit([images_for_first_input, images_for_second_input],
-                                   y_train,
-                                   batch_size=128,
-                                   verbose=verbose,
-                                   epochs=epochs
-                                   )
+                                 y_train,
+                                 batch_size=128,
+                                 verbose=verbose,
+                                 epochs=epochs
+                                 )
         if not (validation_data is None):
             x_test = validation_data[0]
             y_test = validation_data[1]

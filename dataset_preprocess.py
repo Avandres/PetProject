@@ -107,12 +107,12 @@ class DatasetPreprocessor:
             raise NotADirectoryError("There are no directories on the specified path")
         directory_1, directory_2 = np.random.choice(directories, 2, replace=False)
         imagepaths_1 = [filename for filename in os.listdir(directory_1)
-                       if filename.endswith(".png") or filename.endswith(".jpg")]
+                        if filename.endswith(".png") or filename.endswith(".jpg")]
         if not imagepaths_1:
             raise FileNotFoundError("There are no *.png or *.jpg files on the "
                                     + directory_1)
         imagepaths_2 = [filename for filename in os.listdir(directory_2)
-                       if filename.endswith(".png") or filename.endswith(".jpg")]
+                        if filename.endswith(".png") or filename.endswith(".jpg")]
         if not imagepaths_2:
             raise FileNotFoundError("There are no *.png or *.jpg files on the "
                                     + directory_2)
