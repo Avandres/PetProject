@@ -1,5 +1,6 @@
-venv/Lib
+venv
 /archive.zip
 /archive
 /my_face
 /__pycache__
+/test_wave.wav

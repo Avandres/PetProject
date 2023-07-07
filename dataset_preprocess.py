@@ -36,7 +36,7 @@ class DatasetPreprocessor:
         normalized_img = resized_img / 255.0
         return normalized_img
 
-    def __load_preprocessed_image(self, filepath: str, height: int, width: int) -> np.ndarray:
+    def __load_preprocessed_audio(self, filepath: str, height: int, width: int) -> np.ndarray:
         """
         Image loading and preprocessing
 
@@ -82,8 +82,8 @@ class DatasetPreprocessor:
         filename_1, filename_2 = np.random.choice(imagepaths, 2, replace=False)
         imagepath_1 = os.path.join(directory, filename_1)
         imagepath_2 = os.path.join(directory, filename_2)
-        img1 = self.__load_preprocessed_image(imagepath_1, img_height, img_width)
-        img2 = self.__load_preprocessed_image(imagepath_2, img_height, img_width)
+        img1 = self.__load_preprocessed_audio(imagepath_1, img_height, img_width)
+        img2 = self.__load_preprocessed_audio(imagepath_2, img_height, img_width)
         return img1, img2
 
     def __get_different_img_arrays(self, pathslist: list,
@@ -118,8 +118,8 @@ class DatasetPreprocessor:
                                     + directory_2)
         imagepath_1 = os.path.join(directory_1, random.choice(imagepaths_1))
         imagepath_2 = os.path.join(directory_2, random.choice(imagepaths_2))
-        img1 = self.__load_preprocessed_image(imagepath_1, img_height, img_width)
-        img2 = self.__load_preprocessed_image(imagepath_2, img_height, img_width)
+        img1 = self.__load_preprocessed_audio(imagepath_1, img_height, img_width)
+        img2 = self.__load_preprocessed_audio(imagepath_2, img_height, img_width)
         return img1, img2
 
     def get_data(self, sample_size: int, img_height: int,
